@@ -1,4 +1,6 @@
+using AutoMapper;
 using HotPepperSearch.Application.Interfaces;
+using HotPepperSearch.Domain.ValueObjects;
 using HotPepperSearch.WebAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,21 +13,39 @@ public class SalonController : ControllerBase
     private readonly ISalonSearchService _searchService;
     private readonly ISalonSortService _sortService;
     private readonly ISearchHistoryService _historyService;
+    private readonly IMapper _mapper;
+    private readonly ILogger<SalonController> _logger;
 
     public SalonController(
         ISalonSearchService searchService,
         ISalonSortService sortService,
-        ISearchHistoryService historyService)
+        ISearchHistoryService historyService,
+        IMapper mapper,
+        ILogger<SalonController> logger)
     {
         _searchService = searchService;
         _sortService = sortService;
         _historyService = historyService;
+        _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpPost("search")]
-    public Task<IActionResult> SearchAsync([FromBody] SearchRequestDto request, CancellationToken cancellationToken)
+    public async Task<IActionResult> SearchAsync([FromBody] SearchRequestDto request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Search request received: {@Request}", request);
+
+        var searchCondition = _mapper.Map<SearchCondition>(request);
+
+        var result = await _searchService.SearchSalonsByConditionAsync(searchCondition, cancellationToken);
+
+        if (!result.IsSuccess)
+        {
+            _logger.LogWarning("Search failed: {ErrorMessage}", result.ErrorMessage);
+            return BadRequest(new { Error = result.ErrorMessage });
+        }
+
+        return Ok(result.Value);
     }
 
     [HttpGet("{id:guid}")]
