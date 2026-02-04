@@ -2,6 +2,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using HotPepperSearch.Application.Interfaces;
 using HotPepperSearch.Application.Services;
+using HotPepperSearch.Infrastructure.Scraping.Configuration;
+using HotPepperSearch.Infrastructure.Scraping.Interfaces;
+using HotPepperSearch.Infrastructure.Scraping.Services;
 using HotPepperSearch.WebAPI.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +20,19 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(SearchMappingProfile));
+
+// Configuration
+builder.Services.Configure<ScrapingSettings>(
+    builder.Configuration.GetSection("ScrapingSettings"));
+
+// Infrastructure Services
+builder.Services.AddScoped<IHtmlParserService, AngleSharpHtmlParserService>();
+builder.Services.AddScoped<IDelayService, RandomDelayService>();
+builder.Services.AddHttpClient<Application.Interfaces.IScrapingService, HotPepperBeautyScrapingService>((sp, client) =>
+{
+    var settings = builder.Configuration.GetSection("ScrapingSettings").Get<ScrapingSettings>();
+    client.DefaultRequestHeaders.UserAgent.ParseAdd(settings?.UserAgent ?? "Mozilla/5.0");
+});
 
 // Application Services
 builder.Services.AddScoped<ISalonSearchService, SalonSearchService>();

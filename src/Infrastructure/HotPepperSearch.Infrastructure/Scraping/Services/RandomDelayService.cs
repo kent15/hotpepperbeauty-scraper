@@ -13,8 +13,9 @@ public class RandomDelayService : IDelayService
         _settings = settings.Value;
     }
 
-    public Task DelayAsync(CancellationToken cancellationToken = default)
+    public async Task DelayAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var delaySeconds = Random.Shared.Next(_settings.MinDelay, _settings.MaxDelay + 1);
+        await Task.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken);
     }
 }
