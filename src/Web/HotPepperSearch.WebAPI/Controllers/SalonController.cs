@@ -45,7 +45,11 @@ public class SalonController : ControllerBase
             return BadRequest(new { Error = result.ErrorMessage });
         }
 
-        return Ok(result.Value);
+        var salons = result.Value!.ToList();
+        var response = _mapper.Map<List<SalonResponseDto>>(salons);
+
+        _logger.LogInformation("Returning {Count} salons", response.Count);
+        return Ok(response);
     }
 
     [HttpGet("{id:guid}")]
