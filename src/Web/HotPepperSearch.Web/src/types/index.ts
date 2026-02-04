@@ -50,3 +50,12 @@ export const PREFECTURES = [
   '愛知県',
   '福岡県'
 ];
+
+export type SortField = 'Rating' | 'ReviewCount' | 'Price';
+export type SortOrder = 'Ascending' | 'Descending';
+
+export interface SortRequest {
+  field: SortField;
+  order: SortOrder;
+  salons: SalonResponse[];
+}

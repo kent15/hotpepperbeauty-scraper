@@ -1,8 +1,18 @@
 import { SearchForm } from '../components/SearchForm';
+import { SalonTable } from '../components/SalonTable';
 import { useSearch } from '../hooks/useSearch';
 
 export function SearchPage() {
-  const { isLoading, error, results, search } = useSearch();
+  const {
+    isLoading,
+    isSorting,
+    error,
+    results,
+    sortField,
+    sortOrder,
+    search,
+    sort
+  } = useSearch();
 
   return (
     <div className="search-page">
@@ -11,9 +21,13 @@ export function SearchPage() {
       {error && <div className="error-message">{error}</div>}
 
       {results.length > 0 && (
-        <div className="results-summary">
-          <p>{results.length}件のサロンが見つかりました</p>
-        </div>
+        <SalonTable
+          salons={results}
+          onSort={sort}
+          currentSortField={sortField}
+          currentSortOrder={sortOrder}
+          isLoading={isSorting}
+        />
       )}
     </div>
   );
