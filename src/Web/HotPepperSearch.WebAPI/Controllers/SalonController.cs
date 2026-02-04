@@ -1,5 +1,6 @@
 using AutoMapper;
 using HotPepperSearch.Application.Interfaces;
+using HotPepperSearch.Domain.Entities;
 using HotPepperSearch.Domain.ValueObjects;
 using HotPepperSearch.WebAPI.DTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -59,9 +60,19 @@ public class SalonController : ControllerBase
     }
 
     [HttpPost("sort")]
-    public Task<IActionResult> SortAsync([FromBody] SortRequestDto request, CancellationToken cancellationToken)
+    public IActionResult SortAsync([FromBody] SortRequestDto request)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Sort request received: Field={Field}, Order={Order}, Count={Count}",
+            request.Field, request.Order, request.Salons.Count);
+
+        var salons = _mapper.Map<List<Salon>>(request.Salons);
+        var sortOption = _mapper.Map<SortOption>(request);
+
+        var sortedSalons = _sortService.SortSalons(salons, sortOption);
+        var response = _mapper.Map<List<SalonResponseDto>>(sortedSalons);
+
+        _logger.LogInformation("Returning {Count} sorted salons", response.Count);
+        return Ok(response);
     }
 
     [HttpGet("history")]
