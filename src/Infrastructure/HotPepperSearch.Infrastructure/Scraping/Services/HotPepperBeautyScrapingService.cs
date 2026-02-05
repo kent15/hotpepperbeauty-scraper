@@ -42,6 +42,15 @@ public class HotPepperBeautyScrapingService : Application.Interfaces.IScrapingSe
             _logger.LogInformation("Scraping page {Page}: {Url}", currentPage, url);
 
             var html = await FetchHtmlAsync(url, cancellationToken);
+            _logger.LogDebug("Received HTML length: {Length} characters", html.Length);
+
+            // Debug: Log first 500 chars of HTML to verify content
+            if (html.Length > 0)
+            {
+                var preview = html.Length > 500 ? html.Substring(0, 500) : html;
+                _logger.LogDebug("HTML preview: {Preview}", preview);
+            }
+
             var salons = await _htmlParser.ParseSalonListAsync(html, cancellationToken);
             var salonList = salons.ToList();
 
