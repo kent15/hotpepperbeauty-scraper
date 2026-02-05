@@ -10,7 +10,7 @@ public class AngleSharpHtmlParserService : IHtmlParserService
 {
     public async Task<IEnumerable<Salon>> ParseSalonListAsync(string html, CancellationToken cancellationToken = default)
     {
-        var config = Configuration.Default;
+        var config = AngleSharp.Configuration.Default;
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(req => req.Content(html), cancellationToken);
 
