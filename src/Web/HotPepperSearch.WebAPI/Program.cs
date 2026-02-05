@@ -6,6 +6,7 @@ using HotPepperSearch.Infrastructure.Scraping.Configuration;
 using HotPepperSearch.Infrastructure.Scraping.Interfaces;
 using HotPepperSearch.Infrastructure.Scraping.Services;
 using HotPepperSearch.WebAPI.Mappings;
+using IScrapingService = HotPepperSearch.Application.Interfaces.IScrapingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,7 @@ builder.Services.Configure<ScrapingSettings>(
 // Infrastructure Services
 builder.Services.AddScoped<IHtmlParserService, AngleSharpHtmlParserService>();
 builder.Services.AddScoped<IDelayService, RandomDelayService>();
-builder.Services.AddHttpClient<Application.Interfaces.IScrapingService, HotPepperBeautyScrapingService>((sp, client) =>
+builder.Services.AddHttpClient<IScrapingService, HotPepperBeautyScrapingService>((client) =>
 {
     var settings = builder.Configuration.GetSection("ScrapingSettings").Get<ScrapingSettings>();
     client.DefaultRequestHeaders.UserAgent.ParseAdd(settings?.UserAgent ?? "Mozilla/5.0");
