@@ -33,6 +33,10 @@ builder.Services.AddHttpClient<IScrapingService, HotPepperBeautyScrapingService>
 {
     var settings = builder.Configuration.GetSection("ScrapingSettings").Get<ScrapingSettings>();
     client.DefaultRequestHeaders.UserAgent.ParseAdd(settings?.UserAgent ?? "Mozilla/5.0");
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
 
 // Application Services
