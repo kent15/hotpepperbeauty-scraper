@@ -80,10 +80,11 @@ public class HotPepperBeautyScrapingService : Application.Interfaces.IScrapingSe
 
     private string BuildSearchUrl(SearchCondition condition, int page)
     {
-        var genrePath = GetGenrePath(condition.Genre);
-        var areaPath = BuildAreaPath(condition.Prefecture, condition.City);
+        var serviceCode = GetServiceCode(condition.Genre);
+        var (macroArea, prefCode) = GetAreaCodes(condition.Prefecture);
 
-        var url = $"{_settings.BaseUrl}{genrePath}/{areaPath}";
+        // URL format: https://beauty.hotpepper.jp/svcSA/macAB/pre13/
+        var url = $"{_settings.BaseUrl}{serviceCode}/{macroArea}/{prefCode}/";
 
         if (page > 1)
         {
@@ -93,45 +94,44 @@ public class HotPepperBeautyScrapingService : Application.Interfaces.IScrapingSe
         return url;
     }
 
-    private static string GetGenrePath(Genre? genre)
+    private static string GetServiceCode(Genre? genre)
     {
+        // HotPepper Beauty service codes
         return genre switch
         {
-            Genre.HairSalon => "hair",
-            Genre.Nail => "nail",
-            Genre.Esthe => "esthe",
-            Genre.Relaxation => "relaxation",
-            Genre.EyeBeauty => "eye",
-            _ => "hair"
+            Genre.HairSalon => "svcSA",
+            Genre.Nail => "svcSB",
+            Genre.Esthe => "svcSC",
+            Genre.Relaxation => "svcSD",
+            Genre.EyeBeauty => "svcSE",
+            _ => "svcSA"
         };
     }
 
-    private static string BuildAreaPath(string? prefecture, string? city)
+    private static (string MacroArea, string PrefCode) GetAreaCodes(string? prefecture)
     {
+        // Default to Tokyo if no prefecture specified
         if (string.IsNullOrEmpty(prefecture))
         {
-            return "SA23";
+            return ("macAB", "pre13");
         }
 
-        var prefCode = GetPrefectureCode(prefecture);
-        if (string.IsNullOrEmpty(city))
-        {
-            return prefCode;
-        }
-
-        return $"{prefCode}/{city}";
-    }
-
-    private static string GetPrefectureCode(string prefecture)
-    {
+        // HotPepper Beauty area codes
+        // macXX = macro area (region), preXX = prefecture code
         return prefecture switch
         {
-            "東京都" => "SA23",
-            "神奈川県" => "SA24",
-            "大阪府" => "SA47",
-            "愛知県" => "SA35",
-            "福岡県" => "SA56",
-            _ => "SA23"
+            "東京都" => ("macAB", "pre13"),
+            "神奈川県" => ("macAB", "pre14"),
+            "千葉県" => ("macAB", "pre12"),
+            "埼玉県" => ("macAB", "pre11"),
+            "大阪府" => ("macAE", "pre27"),
+            "京都府" => ("macAE", "pre26"),
+            "兵庫県" => ("macAE", "pre28"),
+            "愛知県" => ("macAD", "pre23"),
+            "福岡県" => ("macAG", "pre40"),
+            "北海道" => ("macAA", "pre01"),
+            "宮城県" => ("macAA", "pre04"),
+            _ => ("macAB", "pre13") // Default to Tokyo
         };
     }
 }
