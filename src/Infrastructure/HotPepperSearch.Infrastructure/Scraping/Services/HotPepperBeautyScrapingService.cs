@@ -80,58 +80,80 @@ public class HotPepperBeautyScrapingService : Application.Interfaces.IScrapingSe
 
     private string BuildSearchUrl(SearchCondition condition, int page)
     {
-        var serviceCode = GetServiceCode(condition.Genre);
-        var (macroArea, prefCode) = GetAreaCodes(condition.Prefecture);
+        var prefCode = GetPrefectureCode(condition.Prefecture);
 
-        // URL format: https://beauty.hotpepper.jp/svcSA/macAB/pre13/
-        var url = $"{_settings.BaseUrl}{serviceCode}/{macroArea}/{prefCode}/";
+        // URL format: https://beauty.hotpepper.jp/pre13/
+        // Pagination: https://beauty.hotpepper.jp/pre13/PN2.html
+        var url = $"{_settings.BaseUrl}{prefCode}/";
 
         if (page > 1)
         {
-            url += $"PN{page}.htm";
+            url += $"PN{page}.html";
         }
 
         return url;
     }
 
-    private static string GetServiceCode(Genre? genre)
-    {
-        // HotPepper Beauty service codes
-        return genre switch
-        {
-            Genre.HairSalon => "svcSA",
-            Genre.Nail => "svcSB",
-            Genre.Esthe => "svcSC",
-            Genre.Relaxation => "svcSD",
-            Genre.EyeBeauty => "svcSE",
-            _ => "svcSA"
-        };
-    }
-
-    private static (string MacroArea, string PrefCode) GetAreaCodes(string? prefecture)
+    private static string GetPrefectureCode(string? prefecture)
     {
         // Default to Tokyo if no prefecture specified
         if (string.IsNullOrEmpty(prefecture))
         {
-            return ("macAB", "pre13");
+            return "pre13";
         }
 
-        // HotPepper Beauty area codes
-        // macXX = macro area (region), preXX = prefecture code
+        // HotPepper Beauty prefecture codes
+        // pre{XX} where XX is the JIS prefecture code
         return prefecture switch
         {
-            "東京都" => ("macAB", "pre13"),
-            "神奈川県" => ("macAB", "pre14"),
-            "千葉県" => ("macAB", "pre12"),
-            "埼玉県" => ("macAB", "pre11"),
-            "大阪府" => ("macAE", "pre27"),
-            "京都府" => ("macAE", "pre26"),
-            "兵庫県" => ("macAE", "pre28"),
-            "愛知県" => ("macAD", "pre23"),
-            "福岡県" => ("macAG", "pre40"),
-            "北海道" => ("macAA", "pre01"),
-            "宮城県" => ("macAA", "pre04"),
-            _ => ("macAB", "pre13") // Default to Tokyo
+            "北海道" => "pre01",
+            "青森県" => "pre02",
+            "岩手県" => "pre03",
+            "宮城県" => "pre04",
+            "秋田県" => "pre05",
+            "山形県" => "pre06",
+            "福島県" => "pre07",
+            "茨城県" => "pre08",
+            "栃木県" => "pre09",
+            "群馬県" => "pre10",
+            "埼玉県" => "pre11",
+            "千葉県" => "pre12",
+            "東京都" => "pre13",
+            "神奈川県" => "pre14",
+            "新潟県" => "pre15",
+            "富山県" => "pre16",
+            "石川県" => "pre17",
+            "福井県" => "pre18",
+            "山梨県" => "pre19",
+            "長野県" => "pre20",
+            "岐阜県" => "pre21",
+            "静岡県" => "pre22",
+            "愛知県" => "pre23",
+            "三重県" => "pre24",
+            "滋賀県" => "pre25",
+            "京都府" => "pre26",
+            "大阪府" => "pre27",
+            "兵庫県" => "pre28",
+            "奈良県" => "pre29",
+            "和歌山県" => "pre30",
+            "鳥取県" => "pre31",
+            "島根県" => "pre32",
+            "岡山県" => "pre33",
+            "広島県" => "pre34",
+            "山口県" => "pre35",
+            "徳島県" => "pre36",
+            "香川県" => "pre37",
+            "愛媛県" => "pre38",
+            "高知県" => "pre39",
+            "福岡県" => "pre40",
+            "佐賀県" => "pre41",
+            "長崎県" => "pre42",
+            "熊本県" => "pre43",
+            "大分県" => "pre44",
+            "宮崎県" => "pre45",
+            "鹿児島県" => "pre46",
+            "沖縄県" => "pre47",
+            _ => "pre13" // Default to Tokyo
         };
     }
 }
